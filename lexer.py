@@ -44,7 +44,7 @@ class Lexer: # Main class
             "RBRAK": r"\]", # [...]
             "LBRACE": r"\{", # Zero or More Group
             "RBRACE": r"\}", # {...}
-            "OR": "|", # first | second
+            "OR": r"\|", # first | second
             
             "COMMA": r",", # first, second
             "ASSIGN": r"=", # ex = ...
