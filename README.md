@@ -5,7 +5,8 @@ Hello, this parser I created is for EBNF syntax (a grammar language). First of a
 ```bash
 # This depends on your operating system (OS)
 sudo apt update && sudo apt upgrade
-apt install python```
+sudo apt install python
+```
 
 Once that’s done, you’ll need to create a .py file (e.g., main.py) and run it using `python <your_file>`
 
@@ -33,4 +34,5 @@ digit = "0" | "1" | "2" | "3" | "4" | "5" |  "6" | "7" | "8" | "9";
 """
 ast = parser.parse(ebnf)
 print(ast)
-print(f"\n{ast.pretty()}")```
+print(f"\n{ast.pretty()}")
+```
