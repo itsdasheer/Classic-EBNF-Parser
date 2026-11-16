@@ -1,10 +1,10 @@
-import lexer
-import tree
+from .lexer import *
+from .tree import *
 from sys import exit
 
 class Parser: # Main class
     def __init__(self):
-        self.lexer = lexer.Lexer()
+        self.lexer = Lexer()
         self.toks = []
         self.pos = 0
         self.prev = ''
@@ -26,7 +26,7 @@ class Parser: # Main class
        if c.type in exp:
            return c
        
-       print(lexer.err(self.prev, c.line, c.column, len(c.value)))
+       print(err(self.prev, c.line, c.column, len(c.value)))
        print(f"UnexpectedToken: One of: \n\n* {'\n* '.join(exp)}\n\nwas expected, but found {c.type!r}")
        exit(1)
    
@@ -37,33 +37,33 @@ class Parser: # Main class
         while self.current().value in "|-":
             op = self.consume()
             right = self._process_tree(d=True)
-            left = tree.BinaryOp(left, op, right)
+            left = BinaryOp(left, op, right)
         return left
     
     # Group
     def _group(self, mode):
-        if mode == tree.Default():
+        if mode == Default():
             self.consume("LPAREN")
             v = self._process_bin()
             self.consume("RPAREN")
-            return tree.BinaryOp(mode, "group", v)
-        if mode == tree.Optional():
+            return BinaryOp(mode, "group", v)
+        if mode == Optional():
             self.consume("LBRAK")
             v = self._process_bin()
             self.consume("RBRAK")
-            return tree.BinaryOp(mode, "group", v)
-        if mode == tree.Star():
+            return BinaryOp(mode, "group", v)
+        if mode == Star():
             self.consume("LBRACE")
             v = self._process_bin()
             self.consume("RBRACE")
-            return tree.BinaryOp(mode, "group", v)
+            return BinaryOp(mode, "group", v)
     
     
     # Tree
     def _process_node(self, d=False):
         if self.current().type == "EOF":
             c = self.current()
-            print(lexer.err(self.prev, c.line, c.column))
+            print(err(self.prev, c.line, c.column))
             print("UnexpectedEOF")
             exit(1)
             
@@ -71,44 +71,44 @@ class Parser: # Main class
             c = self.consume("RULE", "TERM")
             if c.type == "RULE":
                 op = "new_rule"
-                left = tree.Rule(c.value)
+                left = Rule(c.value)
                 self.consume("ASSIGN")
                 right = self._process_bin()
                 self.consume("SEMICOLON")
-                return tree.BinaryOp(left, op, right)
+                return BinaryOp(left, op, right)
             elif c.type == "TERM":
                 op = "new_terminal"
                 left = tree.Terminal(c.value)
                 self.consume("ASSIGN")
                 right = self._process_bin()
                 self.consume("SEMICOLON")
-                return tree.BinaryOp(left, op, right)
+                return BinaryOp(left, op, right)
         
         c = self.consume()
         if c.type == "RULE":
-            return tree.Rule(c.value)
+            return Rule(c.value)
         
         if c.type == "TERM":
-            return tree.Terminal(c.value)
+            return Terminal(c.value)
         
         if c.type == "STRING":
-            return tree.String(c.value[1:-1])
+            return String(c.value[1:-1])
         
         # Group
         if c.type == "LPAREN":
             self.pos -= 1
-            return self._group(tree.Default())
+            return self._group(Default())
         
         elif c.type == "LBRAK":
             self.pos -= 1
-            return self._group(tree.Optional())
+            return self._group(Optional())
         
         elif c.type == "LBRACE":
             self.pos -= 1
-            return self._group(tree.Star())
+            return self._group(Star())
         
             
-        print(lexer.err(self.prev, c.line, c.column, len(c.value)))
+        print(err(self.prev, c.line, c.column, len(c.value)))
         
         if c.value in "}])":
             print("SyntaxError: You should not close a group that has no content")
@@ -121,7 +121,7 @@ class Parser: # Main class
         while self.current().value == ",":
             self.consume("COMMA")
             t.append(self._process_node(d))
-        return tree.Tree(t)
+        return Tree(t)
      
     def parse(self, text):
         self._prepare(text)
@@ -129,7 +129,7 @@ class Parser: # Main class
         while self.current().type != "EOF":
             t.append(self._process_tree().children[0])
         self.consume("EOF")
-        return tree.Tree(t)
+        return Tree(t)
 
 
 def main():
