@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from typing import List, Any
-from lexer import Token
+from .lexer import Token
 
 @dataclass
 class Tree: # Main
