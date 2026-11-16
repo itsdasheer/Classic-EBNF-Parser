@@ -26,9 +26,22 @@ class Token:
     column:int=1
     def __repr__(self):
         return f"Token(type={self.type!r}, value={self.value!r})" # it is just a small change in the representation
+    def __str__(self):
+        return self.value
     
-    def pretty(self, idt=0):
-        return f"{'  '*idt}{self.value}" # The ONLY reason this class has a "pretty" function is that I’ll be using the raw version of this class in the Parser, and I need to make them compatible :p
+    # Compare
+    def __eq__(self, other):
+        return self.value == other.value if isinstance(other, Token) else other
+        
+    def __ne__(self, other):
+        return self.value != other.value if isinstance(other, Token) else other
+    
+    def __contains__(self, other):
+        return (other.value if isinstance(other, Token) else other) in self.value
+    
+    # Other
+    def __len__(self):
+        return len(self.value)
 
 class Lexer: # Main class
     def __init__(self):
@@ -77,8 +90,6 @@ class Lexer: # Main class
             print("An empty text cannot be processed.")
             exit(1)
         
-        line = 1
-        column = 1
         for m in self.RE.finditer(text):
             type = m.lastgroup
             match = m.group()
@@ -94,7 +105,7 @@ class Lexer: # Main class
                 print(f"Invalid token: {match!r} (U+{hex(ord(match))[2:].zfill(4)})")
                 exit(1)
             tmp.append(Token(type, match, line, column))
-        tmp.append(Token("EOF", " ", line, column))
+        tmp.append(Token("EOF", " ", line, m.end()+1))
         return tmp
 
 if __name__ == "__main__":
