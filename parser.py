@@ -80,7 +80,7 @@ class Parser: # Main class
                 op = "new_terminal"
                 left = tree.Terminal(c.value)
                 self.consume("ASSIGN")
-                right = self.consume("STRING")
+                right = self._process_bin()
                 self.consume("SEMICOLON")
                 return tree.BinaryOp(left, op, right)
         
@@ -119,7 +119,7 @@ class Parser: # Main class
     def _process_tree(self, d=False):
         t = [self._process_node(d)]
         while self.current().value == ",":
-            self.consume()
+            self.consume("COMMA")
             t.append(self._process_node(d))
         return tree.Tree(t)
      
@@ -130,3 +130,33 @@ class Parser: # Main class
             t.append(self._process_tree().children[0])
         self.consume("EOF")
         return tree.Tree(t)
+
+
+def main():
+    import time
+    
+    text = """
+expr = term, {EXPR, term};
+EXPR = "+" | "-";
+
+term = unary, {TERM, term};
+TERM = "*" | "/" | "%";
+
+unary = [EXPR], power;
+power = atom, {"**", unary};
+
+atom = number | "(", expr, ")";
+number = [{digit}, "."], int | int, ".";
+
+int = digit, {digit};
+digit = "0" | "1" | "2" | "3" | "4" | "5" |  "6" | "7" | "8" | "9";
+    """
+    parser = Parser()
+    
+    s = time.time()
+    parser.parse(text)
+    e = time.time()
+    print((e - s) * 1000)
+    
+if __name__ == "__main__":
+    main()
