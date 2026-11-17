@@ -54,14 +54,17 @@ class Terminal:
     def pretty(self, idt=0):
         return f"{'  '*idt}term {self.term}"
 
+@dataclass
 class Star:
     def pretty(self, idt=0):
         return f"{'  '*idt}star"
         
+@dataclass
 class Default:
     def pretty(self, idt=0):
         return f"{'  '*idt}default"
 
+@dataclass
 class Optional:
     def pretty(self, idt=0):
         return f"{'  '*idt}optional"
